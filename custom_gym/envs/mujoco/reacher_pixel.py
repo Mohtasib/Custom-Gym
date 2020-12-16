@@ -1,13 +1,21 @@
 import numpy as np
 from gym import utils
-from custom_gym.envs.mujoco import mujoco_env
+from custom_gym.envs.mujoco import mujoco_env_pixel
 
-class ReacherEnv(mujoco_env.MujocoEnv, utils.EzPickle):
-    def __init__(self, reward_type, distance_threshold):
+import mujoco_py
+from mujoco_py.mjlib import mjlib
+
+from skimage import color
+from skimage import transform
+
+class ReacherEnvPixel(mujoco_env_pixel.MujocoEnvPixel, utils.EzPickle):
+    def __init__(self, reward_type, distance_threshold, obs_shape):
         self.reward_type = reward_type # the reward type, i.e. 'sparse' or 'dense'
         self.distance_threshold = distance_threshold # the threshold after which a goal is considered achieved
+        self.obs_shape = obs_shape
+        self.memory = np.empty([self.obs_shape[0], self.obs_shape[1], 4],dtype=np.uint8)
         utils.EzPickle.__init__(self)
-        mujoco_env.MujocoEnv.__init__(self, 'reacher.xml', 2)
+        mujoco_env_pixel.MujocoEnvPixel.__init__(self, 'reacher.xml', 2)
 
     def step(self, a):
         vec = self.get_body_com("fingertip")-self.get_body_com("target")
@@ -46,14 +54,23 @@ class ReacherEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         return self._get_obs()
 
     def _get_obs(self):
-        theta = self.model.data.qpos.flat[:2]
-        return np.concatenate([
-            np.cos(theta),
-            np.sin(theta),
-            self.model.data.qpos.flat[2:],
-            self.model.data.qvel.flat[:2],
-            self.get_body_com("fingertip") - self.get_body_com("target")
-        ])
+        data = self._get_viewer().get_image()
+        rawByteImg = data[0]
+        width = data[1]
+        height = data[2]
+
+        tmp = np.fromstring(rawByteImg, dtype=np.uint8)
+        img = np.reshape(tmp, [height, width, 3])
+        img = np.flipud(img) # 500x500x3
+        gray = color.rgb2gray(img) # convert to gray
+        gray_resized = transform.resize(gray,(self.obs_shape[0], self.obs_shape[1])) # resize
+        # update memory buffer
+        # self.memory[1:,:,:] = self.memory[0:3,:,:]
+        self.memory[:,:,1:] = self.memory[:,:,0:3]
+        # self.memory[0,:,:] = gray_resized
+        self.memory[:,:,0] = gray_resized*255
+
+        return self.memory
 
     def compute_reward(self, dist):
         if self.reward_type == 'sparse':

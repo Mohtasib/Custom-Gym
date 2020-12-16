@@ -8,9 +8,10 @@ from skimage import transform
 
 
 class HalfCheetahEnvPixel(mujoco_env_pixel.MujocoEnvPixel, utils.EzPickle):
-    def __init__(self):
+    def __init__(self, obs_shape):
+        self.obs_shape = obs_shape
         # self.memory = np.zeros([4,84,84])
-        self.memory = np.empty([84,84,4],dtype=np.uint8)
+        self.memory = np.empty([self.obs_shape[0], self.obs_shape[1],4],dtype=np.uint8)
         mujoco_env_pixel.MujocoEnvPixel.__init__(self, 'half_cheetah.xml', 5)
         utils.EzPickle.__init__(self)
         
@@ -36,7 +37,7 @@ class HalfCheetahEnvPixel(mujoco_env_pixel.MujocoEnvPixel, utils.EzPickle):
         img = np.reshape(tmp, [height, width, 3])
         img = np.flipud(img) # 500x500x3
         gray = color.rgb2gray(img) # convert to gray (now become 0-1)
-        gray_resized = transform.resize(gray,(84,84)) # resize
+        gray_resized = transform.resize(gray,(self.obs_shape[0], self.obs_shape[1])) # resize
         # update memory buffer
         # self.memory[1:,:,:] = self.memory[0:3,:,:]
         self.memory[:,:,1:] = self.memory[:,:,0:3]

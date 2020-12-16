@@ -6,6 +6,15 @@ from os import path
 from keras.models import load_model
 import cv2
 
+import threading
+
+global frame
+global reward
+global start_computing_rewards
+frame = None
+reward = None
+start_computing_rewards = False
+
 class PendulumEnv(gym.Env):
     metadata = {
         'render.modes': ['human', 'rgb_array'],
@@ -111,6 +120,16 @@ class PendulumEnv(gym.Env):
             costs = norm_th ** 2 + .1 * thdot ** 2 + .001 * (u ** 2)
             return -costs
 
+def reward_thread():
+    global frame
+    global reward
+    global start_computing_rewards
+
+    RewardModel = load_model('/home/abdalkarim/MyProjects/TrainingStableBaselines/FCN_Weights.h5')
+
+    while(True):
+        if start_computing_rewards:
+            reward = RewardModel.predict_on_batch(frame)[0]
 
 class PendulumEnv_v2(gym.Env):
     metadata = {
@@ -143,8 +162,9 @@ class PendulumEnv_v2(gym.Env):
         )
 
         self.seed()
-
-        self.RewardModel = load_model('/home/abdalkarim/MyProjects/MyDDPG/CustomPendulumSparse-v1_data/FCN_RewardFunction/FCN_Weights.h5')
+        
+        t1 = threading.Thread(target=reward_thread, args=[])
+        t1.start()
 
     def seed(self, seed=None):
         self.np_random, seed = seeding.np_random(seed)
@@ -167,6 +187,7 @@ class PendulumEnv_v2(gym.Env):
 
         self.state = np.array([newth, newthdot])
         self.render(mode='rgb_array')
+
         reward = self.compute_reward(th, thdot, u)
 
         return self._get_obs(), reward, False, {}
@@ -239,6 +260,9 @@ class PendulumEnv_v2(gym.Env):
             self.viewer = None
 
     def compute_reward(self, th, thdot, u):
+        global reward
+        global frame
+        global start_computing_rewards
         img_width = 100
         img_height = 100
         num_channels = 3
@@ -246,10 +270,15 @@ class PendulumEnv_v2(gym.Env):
         resized = cv2.resize(image, (img_width, img_height)) 
         reshaped = np.reshape(resized, (-1, img_width, img_height, num_channels)) /255
         
-        reward_img = self.RewardModel.predict_on_batch(reshaped)[0]
-        dense_reward = reward_img[1]
-        # sparse_reward = np.argmax(reward_img) - 1.0
-        sparse_reward = -(dense_reward < 0.8).astype(np.float32)
+        frame = reshaped
+        start_computing_rewards = True
+        
+        while(reward is None): pass
+
+        reward_img = reward
+        dense_reward = (2.0*reward_img[1])-1.0
+        sparse_reward = np.argmax(reward_img) - 1.0
+        # sparse_reward = -(dense_reward < 0.8).astype(np.float32)
 
         norm_th = angle_normalize(th)
         true_reward = -(norm_th > self.angle_threshold or norm_th < -self.angle_threshold).astype(np.float32)

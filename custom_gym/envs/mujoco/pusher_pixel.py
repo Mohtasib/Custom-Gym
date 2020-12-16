@@ -9,8 +9,9 @@ from skimage import color
 from skimage import transform
 
 class PusherEnvPixel(mujoco_env_pixel.MujocoEnvPixel, utils.EzPickle):
-    def __init__(self):
-        self.memory = np.empty([84,84,4],dtype=np.uint8)
+    def __init__(self, obs_shape):
+        self.obs_shape = obs_shape
+        self.memory = np.empty([self.obs_shape[0], self.obs_shape[1], 4],dtype=np.uint8)
         utils.EzPickle.__init__(self)
         mujoco_env_pixel.MujocoEnvPixel.__init__(self, 'pusher.xml', 5)
 
@@ -62,7 +63,7 @@ class PusherEnvPixel(mujoco_env_pixel.MujocoEnvPixel, utils.EzPickle):
         img = np.reshape(tmp, [height, width, 3])
         img = np.flipud(img) # 500x500x3
         gray = color.rgb2gray(img) # convert to gray
-        gray_resized = transform.resize(gray,(84,84)) # resize
+        gray_resized = transform.resize(gray,(self.obs_shape[0], self.obs_shape[1])) # resize
         # update memory buffer
         # self.memory[1:,:,:] = self.memory[0:3,:,:]
         self.memory[:,:,1:] = self.memory[:,:,0:3]
