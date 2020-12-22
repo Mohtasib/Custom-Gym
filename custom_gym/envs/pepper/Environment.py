@@ -71,12 +71,12 @@ class Environment_GUI(BaseEnvironment):
         p.setGravity(0, 0, -9.81)
         p.setAdditionalSearchPath(pybullet_data.getDataPath())
         p.loadMJCF("mjcf/ground_plane.xml")
-        self.objectList = ["bottle", "cup", "mug"]
+        # self.objectList = ["bottle", "cup", "mug"]
         super().__init__()
 
     #creates a Pepper robot
     #returns tthe pepper object
     def createPepper(self, translation=[0,0,0], quaternion=[0, 0, 0, 1] ):
         pepper = PepperVirtual()
-        pepper.loadRobot(translation, quaternion)
+        pepper.loadRobot(translation=[0,0,0], quaternion=[0, 0, 0, 1])
         return pepper

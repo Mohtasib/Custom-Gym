@@ -132,9 +132,9 @@ def calc_inv_pos(angles, target_pos, target_ori, epsilon, right=True):
     while True:
         pos, ori, j = calc_fk_and_jacob(angs, jacob=True, right=right)
         J = _calc_invJ(j)
-        delta_pos = np.matrix((target_pos-pos)[0:3]).transpose()
+        delta_pos = np.matrix((target_pos-pos[:3])[0:3]).transpose()
         v = (J * delta_pos).transpose()
-        angs = np.squeeze(np.asarray(v)) + angs
+        angs = np.squeeze(np.asarray(v)) + angs[:5]
         
         sum = 0
         for d in delta_pos:

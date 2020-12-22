@@ -137,49 +137,105 @@ register(
 # --------------------------------------------------
 
 register(
-    id='PepperSimDIRECTDense-v1',
+    id='PepperSimContinuousDense-v1',
     entry_point='custom_gym.envs.pepper:PepperSimEnv',
     kwargs = {
             'reward_type': 'dense',
             'distance_threshold': 0.08,
             'image_shape': [100, 100, 3],
-            'render_mode': 'DIRECT'
+            'renders': False,
+            'isDiscrete': False
         },
     max_episode_steps=500,
 )
 # --------------------------------------------------
 register(
-    id='PepperSimGUIDense-v1',
+    id='PepperSimRenderContinuousDense-v1',
     entry_point='custom_gym.envs.pepper:PepperSimEnv',
     kwargs = {
             'reward_type': 'dense',
             'distance_threshold': 0.08,
             'image_shape': [100, 100, 3],
-            'render_mode': 'GUI'
+            'renders': True,
+            'isDiscrete': False
         },
     max_episode_steps=500,
 )
 # --------------------------------------------------
 register(
-    id='PepperSimDIRECTSparse-v1',
+    id='PepperSimContinuousSparse-v1',
     entry_point='custom_gym.envs.pepper:PepperSimEnv',
     kwargs = {
             'reward_type': 'sparse',
             'distance_threshold': 0.08,
             'image_shape': [100, 100, 3],
-            'render_mode': 'DIRECT'
+            'renders': False,
+            'isDiscrete': False
         },
     max_episode_steps=500,
 )
 # --------------------------------------------------
 register(
-    id='PepperSimGUISparse-v1',
+    id='PepperSimRenderContinuousSparse-v1',
     entry_point='custom_gym.envs.pepper:PepperSimEnv',
     kwargs = {
             'reward_type': 'sparse',
             'distance_threshold': 0.08,
             'image_shape': [100, 100, 3],
-            'render_mode': 'GUI'
+            'renders': True,
+            'isDiscrete': False
+        },
+    max_episode_steps=500,
+)
+# --------------------------------------------------
+register(
+    id='PepperSimDiscreteDense-v1',
+    entry_point='custom_gym.envs.pepper:PepperSimEnv',
+    kwargs = {
+            'reward_type': 'dense',
+            'distance_threshold': 0.08,
+            'image_shape': [100, 100, 3],
+            'renders': False,
+            'isDiscrete': True
+        },
+    max_episode_steps=500,
+)
+# --------------------------------------------------
+register(
+    id='PepperSimRenderDiscreteDense-v1',
+    entry_point='custom_gym.envs.pepper:PepperSimEnv',
+    kwargs = {
+            'reward_type': 'dense',
+            'distance_threshold': 0.08,
+            'image_shape': [100, 100, 3],
+            'renders': True,
+            'isDiscrete': True
+        },
+    max_episode_steps=500,
+)
+# --------------------------------------------------
+register(
+    id='PepperSimDiscreteSparse-v1',
+    entry_point='custom_gym.envs.pepper:PepperSimEnv',
+    kwargs = {
+            'reward_type': 'sparse',
+            'distance_threshold': 0.08,
+            'image_shape': [100, 100, 3],
+            'renders': False,
+            'isDiscrete': True
+        },
+    max_episode_steps=500,
+)
+# --------------------------------------------------
+register(
+    id='PepperSimRenderDiscreteSparse-v1',
+    entry_point='custom_gym.envs.pepper:PepperSimEnv',
+    kwargs = {
+            'reward_type': 'sparse',
+            'distance_threshold': 0.08,
+            'image_shape': [100, 100, 3],
+            'renders': True,
+            'isDiscrete': True
         },
     max_episode_steps=500,
 )
