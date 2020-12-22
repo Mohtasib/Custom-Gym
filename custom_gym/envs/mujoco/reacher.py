@@ -1,9 +1,19 @@
+from os import path
 import numpy as np
 from gym import utils
 from custom_gym.envs.mujoco import mujoco_env
 
 from keras.models import load_model
 import cv2
+
+import threading
+
+global frame
+global reward
+global start_computing_rewards
+frame = None
+reward = None
+start_computing_rewards = False
 
 class ReacherEnv(mujoco_env.MujocoEnv, utils.EzPickle):
     def __init__(self, reward_type, distance_threshold):
@@ -64,6 +74,17 @@ class ReacherEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         else:
             return -dist
 
+def reward_thread():
+    global frame
+    global reward
+    global start_computing_rewards
+
+    weights = path.join(path.dirname(__file__), "assets/reward_functions/reacher/FCN_Weights.h5")
+    RewardModel = load_model(weights)
+
+    while(True):
+        if start_computing_rewards:
+            reward = RewardModel.predict_on_batch(frame)[0]
 
 class ReacherEnv_v2(mujoco_env.MujocoEnv, utils.EzPickle):
     def __init__(self, reward_type, distance_threshold):
@@ -71,8 +92,10 @@ class ReacherEnv_v2(mujoco_env.MujocoEnv, utils.EzPickle):
         self.distance_threshold = distance_threshold # the threshold after which a goal is considered achieved
         
         self.frame = None
-        self.RewardModel = load_model('/home/abdalkarim/MyProjects/MyDDPG/CustomReacherDense-v1_data/FCN_RewardFunction/FCN_Weights.h5')
-        
+
+        t1 = threading.Thread(target=reward_thread, args=[])
+        t1.start()
+
         utils.EzPickle.__init__(self)
         mujoco_env.MujocoEnv.__init__(self, 'reacher.xml', 2)
 
@@ -126,6 +149,9 @@ class ReacherEnv_v2(mujoco_env.MujocoEnv, utils.EzPickle):
         ])
 
     def compute_reward(self, dist):
+        global reward
+        global frame
+        global start_computing_rewards
         img_width = 100
         img_height = 100
         num_channels = 3
@@ -135,15 +161,20 @@ class ReacherEnv_v2(mujoco_env.MujocoEnv, utils.EzPickle):
         resized = cv2.resize(image, (img_width, img_height)) 
         reshaped = np.reshape(resized, (-1, img_width, img_height, num_channels)) /255
         
-        reward_img = self.RewardModel.predict_on_batch(reshaped)[0]
-        dense_reward = reward_img[1]
+        frame = reshaped
+        start_computing_rewards = True
+        
+        while(reward is None): pass
+
+        reward_img = reward
+        dense_reward = (2.0*reward_img[1])-1.0
         sparse_reward = np.argmax(reward_img) - 1.0
         # sparse_reward = -(dense_reward < 0.005).astype(np.float32)
 
         true_reward = -(dist > self.distance_threshold).astype(np.float32)
 
-        # if sparse_reward != true_reward:
-        #     print(' reward = {}, true reward = {}'.format(sparse_reward, true_reward))
+        if sparse_reward != true_reward:
+            print(' reward = {}, true reward = {}'.format(sparse_reward, true_reward))
 
         if self.reward_type == 'sparse':
             return sparse_reward

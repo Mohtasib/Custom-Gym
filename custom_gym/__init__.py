@@ -53,7 +53,7 @@ register(
     entry_point='custom_gym.envs.mujoco:ReacherEnv',
     kwargs = {
             'reward_type': 'dense',
-            'distance_threshold': 0.005,
+            'distance_threshold': 0.02,
         },
     max_episode_steps=50,
 )
@@ -63,6 +63,16 @@ register(
     entry_point='custom_gym.envs.mujoco:ReacherEnv',
     kwargs = {
             'reward_type': 'sparse',
+            'distance_threshold': 0.02,
+        },
+    max_episode_steps=50,
+)
+
+register(
+    id='CustomReacherVisualDense-v1',
+    entry_point='custom_gym.envs.mujoco:ReacherEnv_v2',
+    kwargs = {
+            'reward_type': 'dense',
             'distance_threshold': 0.02,
         },
     max_episode_steps=50,

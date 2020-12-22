@@ -125,7 +125,8 @@ def reward_thread():
     global reward
     global start_computing_rewards
 
-    RewardModel = load_model('/home/abdalkarim/MyProjects/TrainingStableBaselines/FCN_Weights.h5')
+    weights = path.join(path.dirname(__file__), "assets/reward_functions/pendulum/FCN_Weights.h5")
+    RewardModel = load_model(weights)
 
     while(True):
         if start_computing_rewards:
