@@ -92,6 +92,8 @@ class ReacherEnv_v2(mujoco_env.MujocoEnv, utils.EzPickle):
         self.distance_threshold = distance_threshold # the threshold after which a goal is considered achieved
         
         self.frame = None
+        self.env_steps = 0
+        self.wrong_rewards = 0
 
         t1 = threading.Thread(target=reward_thread, args=[])
         t1.start()
@@ -112,6 +114,7 @@ class ReacherEnv_v2(mujoco_env.MujocoEnv, utils.EzPickle):
         self.do_simulation(a, self.frame_skip)
         ob = self._get_obs()
         done = False
+        self.env_steps += 1
         return ob, reward, done, dict(reward_dist=reward_dist, reward_ctrl=reward_ctrl)
 
     # def viewer_setup(self):
@@ -136,6 +139,10 @@ class ReacherEnv_v2(mujoco_env.MujocoEnv, utils.EzPickle):
         qvel = self.init_qvel + self.np_random.uniform(low=-.005, high=.005, size=self.model.nv)
         qvel[-2:] = 0
         self.set_state(qpos, qvel)
+
+        # print(' Wrong Reward: {}/{}'.format(self.wrong_rewards, self.env_steps))
+        self.env_steps = 0
+        self.wrong_rewards = 0
         return self._get_obs()
 
     def _get_obs(self):
@@ -174,7 +181,8 @@ class ReacherEnv_v2(mujoco_env.MujocoEnv, utils.EzPickle):
         true_reward = -(dist > self.distance_threshold).astype(np.float32)
 
         if sparse_reward != true_reward:
-            print(' reward = {}, true reward = {}'.format(sparse_reward, true_reward))
+            self.wrong_rewards += 1
+            # print(' reward = {}, true reward = {}'.format(sparse_reward, true_reward))
 
         if self.reward_type == 'sparse':
             return sparse_reward
