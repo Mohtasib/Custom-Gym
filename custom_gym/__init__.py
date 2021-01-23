@@ -12,7 +12,7 @@ register(
             'reward_type': 'dense',
             'angle_threshold': 0.15,
         },
-    max_episode_steps=200,
+    max_episode_steps=50,
 )
 
 register(
@@ -22,7 +22,7 @@ register(
             'reward_type': 'sparse',
             'angle_threshold': 0.15,
         },
-    max_episode_steps=200,
+    max_episode_steps=50,
 )
 
 register(
@@ -32,7 +32,7 @@ register(
             'reward_type': 'dense',
             'angle_threshold': 0.15,
         },
-    max_episode_steps=200,
+    max_episode_steps=50,
 )
 
 register(
@@ -42,7 +42,7 @@ register(
             'reward_type': 'sparse',
             'angle_threshold': 0.15,
         },
-    max_episode_steps=200,
+    max_episode_steps=50,
 )
 
 # Mujoco
@@ -65,7 +65,7 @@ register(
             'reward_type': 'sparse',
             'distance_threshold': 0.02,
         },
-    max_episode_steps=50,
+    max_episode_steps=100,
 )
 
 register(
@@ -85,7 +85,7 @@ register(
             'reward_type': 'sparse',
             'distance_threshold': 0.02,
         },
-    max_episode_steps=50,
+    max_episode_steps=100,
 )
 
 register(
