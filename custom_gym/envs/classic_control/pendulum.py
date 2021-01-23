@@ -152,7 +152,7 @@ class SimpleNet(nn.Module):
         self.unit3 = Unit(in_channels=64, out_channels=128)
         self.pool3 = nn.MaxPool2d(kernel_size=2)
 
-        self.unit4 = Unit(in_channels=128, out_channels=64)
+        self.unit4 = Uninum_classest(in_channels=128, out_channels=64)
         self.pool4 = nn.MaxPool2d(kernel_size=2)
 
         self.unit5 = Unit(in_channels=64, out_channels=32)
@@ -376,8 +376,8 @@ class PendulumEnv_v2(gym.Env):
         norm_th = angle_normalize(th)
         true_reward = -(norm_th > self.angle_threshold or norm_th < -self.angle_threshold).astype(np.float32)
 
-        if sparse_reward != true_reward:
-            print(' reward = {}, true reward = {}'.format(sparse_reward, true_reward))
+        # if sparse_reward != true_reward:
+            # print(' reward = {}, true reward = {}'.format(sparse_reward, true_reward))
 
         if self.reward_type == 'sparse':
             return sparse_reward
