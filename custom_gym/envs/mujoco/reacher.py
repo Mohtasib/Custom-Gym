@@ -19,6 +19,8 @@ class ReacherEnv(mujoco_env.MujocoEnv, utils.EzPickle):
     def __init__(self, reward_type, distance_threshold):
         self.reward_type = reward_type # the reward type, i.e. 'sparse' or 'dense'
         self.distance_threshold = distance_threshold # the threshold after which a goal is considered achieved
+
+        self.state = None
         utils.EzPickle.__init__(self)
         mujoco_env.MujocoEnv.__init__(self, 'reacher.xml', 2)
 
@@ -27,6 +29,8 @@ class ReacherEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         reward_dist = - np.linalg.norm(vec)
         reward_ctrl = - np.square(a).sum()
         # reward = reward_dist + reward_ctrl
+
+        self.state = -reward_dist
         reward = self.compute_reward(-reward_dist)
 
         self.do_simulation(a, self.frame_skip)
@@ -91,6 +95,7 @@ class ReacherEnv_v2(mujoco_env.MujocoEnv, utils.EzPickle):
         self.reward_type = reward_type # the reward type, i.e. 'sparse' or 'dense'
         self.distance_threshold = distance_threshold # the threshold after which a goal is considered achieved
         
+        self.state = None
         self.frame = None
         self.env_steps = 0
         self.wrong_rewards = 0
@@ -109,6 +114,7 @@ class ReacherEnv_v2(mujoco_env.MujocoEnv, utils.EzPickle):
         self.frame = self.render(mode='rgb_array')
         self.frame = cv2.cvtColor(self.frame, cv2.COLOR_BGR2RGB)
 
+        self.state = -reward_dist
         reward = self.compute_reward(-reward_dist)
 
         self.do_simulation(a, self.frame_skip)
@@ -140,7 +146,7 @@ class ReacherEnv_v2(mujoco_env.MujocoEnv, utils.EzPickle):
         qvel[-2:] = 0
         self.set_state(qpos, qvel)
 
-        # print(' Wrong Reward: {}/{}'.format(self.wrong_rewards, self.env_steps))
+        print(' Wrong Reward: {}/{}'.format(self.wrong_rewards, self.env_steps))
         self.env_steps = 0
         self.wrong_rewards = 0
         return self._get_obs()

@@ -65,7 +65,7 @@ register(
             'reward_type': 'sparse',
             'distance_threshold': 0.02,
         },
-    max_episode_steps=100,
+    max_episode_steps=50,
 )
 
 register(
@@ -85,7 +85,7 @@ register(
             'reward_type': 'sparse',
             'distance_threshold': 0.02,
         },
-    max_episode_steps=100,
+    max_episode_steps=50,
 )
 
 register(
@@ -93,7 +93,7 @@ register(
     entry_point='custom_gym.envs.mujoco:PusherEnv',
     kwargs = {
             'reward_type': 'dense',
-            'distance_threshold': 0.005,
+            'distance_threshold': 0.08,
         },
     max_episode_steps=100,
 )
@@ -103,9 +103,29 @@ register(
     entry_point='custom_gym.envs.mujoco:PusherEnv',
     kwargs = {
             'reward_type': 'sparse',
-            'distance_threshold': 0.01,
+            'distance_threshold': 0.08,
         },
     max_episode_steps=100,
+)
+
+register(
+    id='CustomPusherVisualDense-v1',
+    entry_point='custom_gym.envs.mujoco:PusherEnv_v2',
+    kwargs = {
+            'reward_type': 'dense',
+            'distance_threshold': 0.08,
+        },
+    max_episode_steps=50,
+)
+
+register(
+    id='CustomPusherVisualSparse-v1',
+    entry_point='custom_gym.envs.mujoco:PusherEnv_v2',
+    kwargs = {
+            'reward_type': 'sparse',
+            'distance_threshold': 0.08,
+        },
+    max_episode_steps=50,
 )
 
 # --------------------------------------------------
