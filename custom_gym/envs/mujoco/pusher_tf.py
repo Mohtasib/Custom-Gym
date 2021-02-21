@@ -174,8 +174,15 @@ class PusherEnv_v2(mujoco_env.MujocoEnv, utils.EzPickle):
         reshaped = np.reshape(resized, (-1, img_width, img_height, num_channels)) /255
 
         reward_img = self.RewardModel.predict_on_batch(reshaped)[0]
-        dense_reward = (2.0*reward_img[1])-1.0
-        sparse_reward = np.argmax(reward_img) - 1.0
+        
+        visual_reward_thresholds = 0.8
+
+        if reward_img[1] >= visual_reward_thresholds:
+            dense_reward = (reward_img[1] - visual_reward_thresholds)/(1 - visual_reward_thresholds)
+        else:
+            dense_reward = (reward_img[1] / visual_reward_thresholds) - 1
+
+        sparse_reward = -(reward_img[1] <= visual_reward_thresholds).astype(np.float32)
 
         true_reward = -(dist > self.distance_threshold).astype(np.float32)
 

@@ -95,7 +95,7 @@ register(
             'reward_type': 'dense',
             'distance_threshold': 0.08,
         },
-    max_episode_steps=100,
+    max_episode_steps=50,
 )
 
 register(
@@ -105,7 +105,7 @@ register(
             'reward_type': 'sparse',
             'distance_threshold': 0.08,
         },
-    max_episode_steps=100,
+    max_episode_steps=50,
 )
 
 register(
@@ -162,6 +162,29 @@ register(
 )
 # --------------------------------------------------
 
+# Robotics
+# --------------------------------------------------
+
+register(
+        id='CustomFetchReachDense-v1',
+        entry_point='custom_gym.envs.robotics:FetchReachEnv',
+        kwargs = {
+            'reward_type': 'dense',
+            'distance_threshold': 0.05,
+            },
+        max_episode_steps=50,
+    )
+# --------------------------------------------------
+register(
+        id='CustomFetchReachSparse-v1',
+        entry_point='custom_gym.envs.robotics:FetchReachEnv',
+        kwargs = {
+            'reward_type': 'sparse',
+            'distance_threshold': 0.05,
+            },
+        max_episode_steps=50,
+    )
+# --------------------------------------------------
 
 # Pepper Aldebaran Robot
 # --------------------------------------------------

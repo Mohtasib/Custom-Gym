@@ -261,22 +261,17 @@ class ReacherEnv_v2(mujoco_env.MujocoEnv, utils.EzPickle):
         cv2.waitKey(1)
         resized = cv2.resize(image, (img_width, img_height)) 
         reshaped = np.reshape(resized, (num_channels, img_height, img_width)) /255
-        
-        # frame = reshaped
-        # start_computing_rewards = True
 
-        # reward = None
+        reward_img = self.RewardModel.predict(reshaped)[0]
 
-        # while(reward is None): pass
+        visual_reward_thresholds = 0.5
 
-        reward2 = self.RewardModel.predict(reshaped)[0]
-        print(' reward = {}, dist = {}'.format(reward2, dist))
-        time.sleep(5)
-        
-        reward_img = reward2
-        dense_reward = (2.0*reward_img[1])-1.0
-        sparse_reward = np.argmax(reward_img) - 1.0
-        # sparse_reward = -(dense_reward < 0.005).astype(np.float32)
+        if reward_img[1] >= visual_reward_thresholds:
+            dense_reward = (reward_img[1] - visual_reward_thresholds)/(1 - visual_reward_thresholds)
+        else:
+            dense_reward = (reward_img[1] / visual_reward_thresholds) - 1
+
+        sparse_reward = -(reward_img[1] <= visual_reward_thresholds).astype(np.float32)
 
         true_reward = -(dist > self.distance_threshold).astype(np.float32)
 

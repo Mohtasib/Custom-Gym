@@ -180,9 +180,15 @@ class ReacherEnv_v2(mujoco_env.MujocoEnv, utils.EzPickle):
         while(reward is None): pass
 
         reward_img = reward
-        dense_reward = (2.0*reward_img[1])-1.0
-        sparse_reward = np.argmax(reward_img) - 1.0
-        # sparse_reward = -(dense_reward < 0.005).astype(np.float32)
+
+        visual_reward_thresholds = 0.5
+
+        if reward_img[1] >= visual_reward_thresholds:
+            dense_reward = (reward_img[1] - visual_reward_thresholds)/(1 - visual_reward_thresholds)
+        else:
+            dense_reward = (reward_img[1] / visual_reward_thresholds) - 1
+
+        sparse_reward = -(reward_img[1] <= visual_reward_thresholds).astype(np.float32)
 
         true_reward = -(dist > self.distance_threshold).astype(np.float32)
 
