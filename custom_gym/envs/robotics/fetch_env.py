@@ -115,10 +115,17 @@ class FetchEnv(robot_env.RobotEnv):
         ])
 
         return {
-            'observation': obs.copy(),
+            'observation': np.concatenate((obs.copy(),self.goal.copy())),
             'achieved_goal': achieved_goal.copy(),
             'desired_goal': self.goal.copy(),
         }
+
+        # return {
+        #     'observation': obs.copy(),
+        #     'achieved_goal': achieved_goal.copy(),
+        #     'desired_goal': self.goal.copy(),
+        # }
+
 
     def _viewer_setup(self):
         body_id = self.sim.model.body_name2id('robot0:gripper_link')
@@ -128,6 +135,11 @@ class FetchEnv(robot_env.RobotEnv):
         self.viewer.cam.distance = 2.5
         self.viewer.cam.azimuth = 132.
         self.viewer.cam.elevation = -14.
+
+        # self.viewer.cam.trackbodyid = 0         # id of the body to track ()
+        self.viewer.cam.lookat[0] += -0.50         # x,y,z offset from the object (works if trackbodyid=-1)
+        self.viewer.cam.lookat[1] += 0.0
+        self.viewer.cam.lookat[2] += 0.0
 
     def _render_callback(self):
         # Visualize target.
@@ -188,3 +200,7 @@ class FetchEnv(robot_env.RobotEnv):
 
     def render(self, mode='human', width=500, height=500):
         return super(FetchEnv, self).render(mode, width, height)
+
+    def get_obs(self):
+        obs = self._get_obs()
+        return obs['observation']

@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 from gym.envs.registration import register
 
+from custom_gym.reward_models.cnn_model import CNN_Model
 
 # Classic
 # --------------------------------------------------
@@ -27,9 +28,9 @@ register(
 
 register(
     id='CustomPendulumVisualDense-v1',
-    entry_point='custom_gym.envs.classic_control:PendulumEnv_v2',
+    entry_point='custom_gym.envs.classic_control:PendulumEnv',
     kwargs = {
-            'reward_type': 'dense',
+            'reward_type': 'visual_dense',
             'angle_threshold': 0.15,
         },
     max_episode_steps=50,
@@ -37,9 +38,9 @@ register(
 
 register(
     id='CustomPendulumVisualSparse-v1',
-    entry_point='custom_gym.envs.classic_control:PendulumEnv_v2',
+    entry_point='custom_gym.envs.classic_control:PendulumEnv',
     kwargs = {
-            'reward_type': 'sparse',
+            'reward_type': 'visual_sparse',
             'angle_threshold': 0.15,
         },
     max_episode_steps=50,
@@ -70,9 +71,9 @@ register(
 
 register(
     id='CustomReacherVisualDense-v1',
-    entry_point='custom_gym.envs.mujoco:ReacherEnv_v2',
+    entry_point='custom_gym.envs.mujoco:ReacherEnv',
     kwargs = {
-            'reward_type': 'dense',
+            'reward_type': 'visual_dense',
             'distance_threshold': 0.02,
         },
     max_episode_steps=50,
@@ -80,9 +81,9 @@ register(
 
 register(
     id='CustomReacherVisualSparse-v1',
-    entry_point='custom_gym.envs.mujoco:ReacherEnv_v2',
+    entry_point='custom_gym.envs.mujoco:ReacherEnv',
     kwargs = {
-            'reward_type': 'sparse',
+            'reward_type': 'visual_sparse',
             'distance_threshold': 0.02,
         },
     max_episode_steps=50,
@@ -110,9 +111,9 @@ register(
 
 register(
     id='CustomPusherVisualDense-v1',
-    entry_point='custom_gym.envs.mujoco:PusherEnv_v2',
+    entry_point='custom_gym.envs.mujoco:PusherEnv',
     kwargs = {
-            'reward_type': 'dense',
+            'reward_type': 'visual_dense',
             'distance_threshold': 0.08,
         },
     max_episode_steps=50,
@@ -120,9 +121,9 @@ register(
 
 register(
     id='CustomPusherVisualSparse-v1',
-    entry_point='custom_gym.envs.mujoco:PusherEnv_v2',
+    entry_point='custom_gym.envs.mujoco:PusherEnv',
     kwargs = {
-            'reward_type': 'sparse',
+            'reward_type': 'visual_sparse',
             'distance_threshold': 0.08,
         },
     max_episode_steps=50,
@@ -180,6 +181,26 @@ register(
         entry_point='custom_gym.envs.robotics:FetchReachEnv',
         kwargs = {
             'reward_type': 'sparse',
+            'distance_threshold': 0.05,
+            },
+        max_episode_steps=50,
+    )
+# --------------------------------------------------
+register(
+        id='CustomFetchReachVisualDense-v1',
+        entry_point='custom_gym.envs.robotics:FetchReachEnv',
+        kwargs = {
+            'reward_type': 'visual_dense',
+            'distance_threshold': 0.05,
+            },
+        max_episode_steps=50,
+    )
+# --------------------------------------------------
+register(
+        id='CustomFetchReachVisualSparse-v1',
+        entry_point='custom_gym.envs.robotics:FetchReachEnv',
+        kwargs = {
+            'reward_type': 'visual_sparse',
             'distance_threshold': 0.05,
             },
         max_episode_steps=50,

@@ -93,9 +93,10 @@ class RobotEnv(gym.GoalEnv):
     def render(self, mode='human', width=DEFAULT_SIZE, height=DEFAULT_SIZE):
         self._render_callback()
         if mode == 'rgb_array':
-            self._get_viewer(mode).render(width, height)
+            self._get_viewer(mode).render()
+            # self._get_viewer(mode).render(width, height)
             # window size used for old mujoco-py:
-            data = self._get_viewer(mode).read_pixels(width, height, depth=False)
+            data = self._get_viewer(mode).read_pixels(2000, 1200, depth=False)
             # original image is upside-down, so flip it
             return data[::-1, :, :]
         elif mode == 'human':
@@ -107,7 +108,7 @@ class RobotEnv(gym.GoalEnv):
             if mode == 'human':
                 self.viewer = mujoco_py.MjViewer(self.sim)
             elif mode == 'rgb_array':
-                self.viewer = mujoco_py.MjRenderContextOffscreen(self.sim, device_id=-1)
+                self.viewer = mujoco_py.MjViewer(self.sim)
             self._viewer_setup()
             self._viewers[mode] = self.viewer
         return self.viewer
