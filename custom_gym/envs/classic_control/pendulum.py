@@ -10,8 +10,9 @@ class PendulumEnv(gym.Env):
         'video.frames_per_second': 30
     }
 
-    def __init__(self, reward_type, angle_threshold, g=10.0):
+    def __init__(self, reward_type='dense', reward_model=None, angle_threshold=0.15, g=10.0):
         self.reward_type = reward_type # the reward type, i.e. 'sparse' or 'dense'
+        self.reward_model = reward_model # the type of the reward model, it is either 'CNN' or 'T_CNN'
         self.angle_threshold = angle_threshold # the threshold after which a goal is considered achieved
         self.max_speed = 8
         self.max_torque = 2.
@@ -38,14 +39,16 @@ class PendulumEnv(gym.Env):
         if 'visual' in self.reward_type:
             global cv2
             import cv2
-            from custom_gym import CNN_Model
+            from importlib import import_module
 
             self.frame = None
             self.env_steps = 0
             self.wrong_rewards = 0
 
-            weights = path.join(path.dirname(__file__), "assets/reward_functions/pendulum/CNN_reward_model")
-            self.RewardModel = CNN_Model()
+            rewardModule = import_module(f'custom_gym.reward_models.{self.reward_model.lower()}_model', package=None)
+            rewardClass = getattr(rewardModule, self.reward_model.upper() + '_Model')
+            weights = path.join(path.dirname(__file__), f"assets/reward_functions/pendulum/{self.reward_model}_reward_model")
+            self.RewardModel = rewardClass()
             self.RewardModel.load_model(weights)
 
     def seed(self, seed=None):

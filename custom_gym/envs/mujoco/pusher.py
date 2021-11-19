@@ -4,22 +4,25 @@ from gym import utils
 from custom_gym.envs.mujoco import mujoco_env
 
 class PusherEnv(mujoco_env.MujocoEnv, utils.EzPickle):
-    def __init__(self, reward_type, distance_threshold):
+    def __init__(self, reward_type='dense', reward_model=None, distance_threshold=0.08):
         self.reward_type = reward_type # the reward type, i.e. 'sparse' or 'dense'
+        self.reward_model = reward_model # the type of the reward model, it is either 'CNN' or 'T_CNN'
         self.distance_threshold = distance_threshold # the threshold after which a goal is considered achieved
-        
+
         self.state = None
         if 'visual' in self.reward_type:
             global cv2
             import cv2
-            from custom_gym import CNN_Model
+            from importlib import import_module
 
             self.frame = None
             self.env_steps = 0
             self.wrong_rewards = 0
 
-            weights = path.join(path.dirname(__file__), "assets/reward_functions/pusher/CNN_reward_model")
-            self.RewardModel = CNN_Model()
+            rewardModule = import_module(f'custom_gym.reward_models.{self.reward_model.lower()}_model', package=None)
+            rewardClass = getattr(rewardModule, self.reward_model.upper() + '_Model')
+            weights = path.join(path.dirname(__file__), f"assets/reward_functions/pusher/{self.reward_model}_reward_model")
+            self.RewardModel = rewardClass()
             self.RewardModel.load_model(weights)
 
         utils.EzPickle.__init__(self)

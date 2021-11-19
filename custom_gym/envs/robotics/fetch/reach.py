@@ -7,7 +7,7 @@ from custom_gym.envs.robotics import fetch_env
 MODEL_XML_PATH = os.path.join('fetch', 'reach.xml')
 
 class FetchReachEnv(fetch_env.FetchEnv, utils.EzPickle):
-    def __init__(self, reward_type='sparse', distance_threshold=0.05):
+    def __init__(self, reward_type='dense', reward_model=None, distance_threshold=0.05):
         initial_qpos = {
             'robot0:slide0': 0.4049,
             'robot0:slide1': 0.48,
@@ -17,21 +17,23 @@ class FetchReachEnv(fetch_env.FetchEnv, utils.EzPickle):
             self, MODEL_XML_PATH, has_object=False, block_gripper=True, n_substeps=20,
             gripper_extra_height=0.2, target_in_the_air=True, target_offset=0.0,
             obj_range=0.15, target_range=0.15, distance_threshold=distance_threshold,
-            initial_qpos=initial_qpos, reward_type=reward_type)
+            initial_qpos=initial_qpos, reward_type=reward_type, reward_model=reward_model)
         utils.EzPickle.__init__(self)
 
         self.state = None
         if 'visual' in self.reward_type:
             global cv2
             import cv2
-            from custom_gym import CNN_Model
+            from importlib import import_module
 
             self.frame = None
             self.env_steps = 0
             self.wrong_rewards = 0
 
-            weights = os.path.join(os.path.dirname(__file__), "../assets/fetch/reward_functions/reach/CNN_reward_model")
-            self.RewardModel = CNN_Model()
+            rewardModule = import_module(f'custom_gym.reward_models.{self.reward_model.lower()}_model', package=None)
+            rewardClass = getattr(rewardModule, self.reward_model.upper() + '_Model')
+            weights = os.path.join(os.path.dirname(__file__), f"../assets/fetch/reward_functions/reach/{self.reward_model}_reward_model")
+            self.RewardModel = rewardClass()
             self.RewardModel.load_model(weights)
 
     def step(self, action):
