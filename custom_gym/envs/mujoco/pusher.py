@@ -81,7 +81,7 @@ class PusherEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         self.set_state(qpos, qvel)
 
         if 'visual' in self.reward_type:
-            # print(' Wrong Reward: {}/{}'.format(self.wrong_rewards, self.env_steps))
+            print(' Wrong Reward: {}/{}'.format(self.wrong_rewards, self.env_steps))
             self.env_steps = 0
             self.wrong_rewards = 0
 
@@ -89,8 +89,8 @@ class PusherEnv(mujoco_env.MujocoEnv, utils.EzPickle):
 
     def _get_obs(self):
         return np.concatenate([
-            self.model.data.qpos.flat[:7],
-            self.model.data.qvel.flat[:7],
+            self.sim.data.qpos.flat[:7],
+            self.sim.data.qvel.flat[:7],
             self.get_body_com("tips_arm"),
             self.get_body_com("object"),
             self.get_body_com("goal"),

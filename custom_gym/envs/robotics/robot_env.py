@@ -109,7 +109,7 @@ class RobotEnv(gym.GoalEnv):
                 self.viewer = mujoco_py.MjViewer(self.sim)
             elif mode == 'rgb_array':
                 self.viewer = mujoco_py.MjViewer(self.sim)
-            # self.viewer._run_speed = 64
+            self.viewer._run_speed = 64
             self._viewer_setup()
             self._viewers[mode] = self.viewer
         return self.viewer

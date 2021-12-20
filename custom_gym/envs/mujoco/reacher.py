@@ -69,19 +69,19 @@ class ReacherEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         self.set_state(qpos, qvel)
 
         if 'visual' in self.reward_type:
-            # print(' Wrong Reward: {}/{}'.format(self.wrong_rewards, self.env_steps))
+            print(' Wrong Reward: {}/{}'.format(self.wrong_rewards, self.env_steps))
             self.env_steps = 0
             self.wrong_rewards = 0
 
         return self._get_obs()
 
     def _get_obs(self):
-        theta = self.model.data.qpos.flat[:2]
+        theta = self.sim.data.qpos.flat[:2]
         return np.concatenate([
             np.cos(theta),
             np.sin(theta),
-            self.model.data.qpos.flat[2:],
-            self.model.data.qvel.flat[:2],
+            self.sim.data.qpos.flat[2:],
+            self.sim.data.qvel.flat[:2],
             self.get_body_com("fingertip") - self.get_body_com("target")
         ])
 
